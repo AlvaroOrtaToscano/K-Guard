@@ -9,12 +9,12 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>k-guard</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>demo</name>
-	<description/>
-	<url/>
+	<name>K-Guard</name>
+	<description>K-Guard: monitorización continua de potasio (K+) para pacientes con ERC e insuficiencia cardíaca</description>
+	<url>https://github.com/AlvaroOrtaToscano/K-Guard</url>
 	<licenses>
 		<license/>
 	</licenses>
@@ -22,18 +22,23 @@
 		<developer/>
 	</developers>
 	<scm>
-		<connection/>
-		<developerConnection/>
+		<connection>scm:git:https://github.com/AlvaroOrtaToscano/K-Guard.git</connection>
+		<developerConnection>scm:git:https://github.com/AlvaroOrtaToscano/K-Guard.git</developerConnection>
 		<tag/>
-		<url/>
+		<url>https://github.com/AlvaroOrtaToscano/K-Guard</url>
 	</scm>
 	<properties>
-		<java.version>25</java.version>
+		<java.version>21</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>

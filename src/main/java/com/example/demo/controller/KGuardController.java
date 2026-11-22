@@ -15,10 +15,11 @@ public class KGuardController {
         info.put("dispositivo", "K-Guard");
         info.put("descripcion", "Sensor de monitorización continua de potasio en sangre");
         info.put("unidad", "mmol/L");
-        info.put("rangoNormalMin", 3.5);
-        info.put("rangoNormalMax", 5.0);
-        info.put("ultimaLectura", 4.2);
-        info.put("estado", "Normal");
+        info.put("modelo", "KG-Patch v1");
+        info.put("firmware", "1.0.3");
+        info.put("bateriaTransmisor", 87);       // %
+        info.put("conexionBLE", "Conectado");
+        info.put("diasRestantesParche", 9);
         return info;
     }
 }

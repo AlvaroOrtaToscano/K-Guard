@@ -12,7 +12,7 @@ import jakarta.persistence.Id;
 /**
  * Lectura de potasio (K+) que el transmisor envía cada 5 minutos (RF1).
  * Corresponde a la clase LecturaK del diagrama de clases. Hibernate crea a partir
- * de ella la tabla LECTURA_K en H2.
+ * de ella la tabla LECTURAK en H2.
  */
 @Entity
 public class LecturaK {

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.demo.model.LecturaK;
 
 /**
- * Acceso a la tabla LECTURA_K. JpaRepository ya da save, findAll, findById,
+ * Acceso a la tabla LECTURAK. JpaRepository ya da save, findAll, findById,
  * existsById y deleteById; los métodos de abajo los genera Spring a partir del nombre.
  */
 public interface LecturaKRepository extends JpaRepository<LecturaK, Long> {

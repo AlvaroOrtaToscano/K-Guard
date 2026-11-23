@@ -8,15 +8,16 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.model.Lectura;
 import com.example.demo.model.LecturaRepository;
+import com.example.demo.model.NivelK;
 
 @Service
 public class LecturaService {
 
-    // Rangos de K+ en sangre (mEq/L) del documento de K-Guard
-    private static final double CRITICO_BAJO = 2.5;
-    private static final double LIMITE_INFERIOR = 3.5;
-    private static final double LIMITE_SUPERIOR = 5.0;
-    private static final double CRITICO_ALTO = 6.0;
+    // Umbrales por defecto del documento de K-Guard (mEq/L)
+    private static final double ROJO_BAJO = 3.0;
+    private static final double VERDE_MIN = 3.5;
+    private static final double VERDE_MAX = 5.0;
+    private static final double ROJO_ALTO = 5.5;
 
     private final LecturaRepository repository;
 
@@ -39,28 +40,33 @@ public class LecturaService {
         return repository.findByPacienteIdOrderByFechaHoraDesc(pacienteId);
     }
 
-    // CREAR: llega una lectura nueva del transmisor
+    // CREAR: llega una lectura nueva del transmisor (CU11)
     public Lectura crear(Lectura lectura) {
-        validar(lectura);
-        lectura.setId(null);
         if (lectura.getFechaHora() == null) {
             lectura.setFechaHora(LocalDateTime.now().withNano(0));
         }
-        lectura.setEstado(clasificar(lectura.getValor()));
+        validar(lectura);
+        if (repository.existsByTransmisorIdAndFechaHora(lectura.getTransmisorId(), lectura.getFechaHora())) {
+            throw new IllegalStateException("La lectura del transmisor " + lectura.getTransmisorId()
+                    + " de las " + lectura.getFechaHora() + " ya está guardada.");
+        }
+        lectura.setId(null);
+        lectura.setNivel(clasificar(lectura.getValor()));
         return repository.save(lectura);
     }
 
     // ACTUALIZAR: corregir una lectura
     public Optional<Lectura> actualizar(Long id, Lectura datos) {
-        validar(datos);
         return repository.findById(id).map(lectura -> {
+            if (datos.getFechaHora() == null) {
+                datos.setFechaHora(lectura.getFechaHora());
+            }
+            validar(datos);
             lectura.setPacienteId(datos.getPacienteId());
             lectura.setTransmisorId(datos.getTransmisorId());
             lectura.setValor(datos.getValor());
-            if (datos.getFechaHora() != null) {
-                lectura.setFechaHora(datos.getFechaHora());
-            }
-            lectura.setEstado(clasificar(datos.getValor()));
+            lectura.setFechaHora(datos.getFechaHora());
+            lectura.setNivel(clasificar(datos.getValor()));
             return repository.save(lectura);
         });
     }
@@ -74,7 +80,7 @@ public class LecturaService {
         return true;
     }
 
-    // Lógica de negocio: comprobar que la lectura tiene sentido
+    // Lógica de negocio: la lectura tiene que tener sentido (CU11, flujo 2a)
     private void validar(Lectura lectura) {
         if (lectura.getPacienteId() == null || lectura.getPacienteId().isBlank()) {
             throw new IllegalArgumentException("La lectura tiene que indicar el paciente.");
@@ -82,19 +88,19 @@ public class LecturaService {
         if (lectura.getValor() <= 0 || lectura.getValor() > 10) {
             throw new IllegalArgumentException("El valor de potasio no es válido (debe estar entre 0 y 10 mEq/L).");
         }
+        if (lectura.getFechaHora().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La fecha de la lectura no puede ser futura.");
+        }
     }
 
-    // Lógica de negocio: clasificar el potasio según los rangos
-    private String clasificar(double valor) {
-        if (valor < CRITICO_BAJO || valor > CRITICO_ALTO) {
-            return "CRITICO";
+    // Lógica de negocio: color según los umbrales por defecto (RF2)
+    private NivelK clasificar(double valor) {
+        if (valor < ROJO_BAJO || valor > ROJO_ALTO) {
+            return NivelK.ROJO;
         }
-        if (valor < LIMITE_INFERIOR) {
-            return "HIPOPOTASEMIA";
+        if (valor < VERDE_MIN || valor > VERDE_MAX) {
+            return NivelK.AMBAR;
         }
-        if (valor > LIMITE_SUPERIOR) {
-            return "HIPERPOTASEMIA";
-        }
-        return "NORMAL";
+        return NivelK.VERDE;
     }
 }

@@ -75,4 +75,10 @@ public class LecturaController {
     public ResponseEntity<String> error(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    // Si la lectura ya estaba guardada (repetida), se devuelve 409
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> repetida(IllegalStateException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
 }

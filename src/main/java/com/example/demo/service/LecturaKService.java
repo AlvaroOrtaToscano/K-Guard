@@ -24,6 +24,9 @@ public class LecturaKService {
     private static final double AMBAR_MIN = 3.0;
     private static final double AMBAR_MAX = 5.5;
 
+    // Por encima de este valor la lectura está fuera del rango fisiológico (apartado 8.4.2)
+    private static final double VALOR_MAX = 10.0;
+
     // numSecuencia ocupa 2 bytes en la trama BLE (apartado 8.4.2)
     private static final int NUM_SECUENCIA_MAX = 65535;
 
@@ -105,8 +108,8 @@ public class LecturaKService {
                 || lectura.getNumSecuencia() < 0 || lectura.getNumSecuencia() > NUM_SECUENCIA_MAX) {
             throw new IllegalArgumentException("El número de secuencia es obligatorio y va de 0 a " + NUM_SECUENCIA_MAX);
         }
-        if (lectura.getValor() == null || lectura.getValor() <= 0) {
-            throw new IllegalArgumentException("El valor de K+ es obligatorio y debe ser mayor que 0 mEq/L");
+        if (lectura.getValor() == null || lectura.getValor() <= 0 || lectura.getValor() > VALOR_MAX) {
+            throw new IllegalArgumentException("El valor de K+ es obligatorio y debe estar entre 0 y 10 mEq/L");
         }
         if (lectura.getFechaHora().isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("La fecha de la lectura no puede ser futura");
